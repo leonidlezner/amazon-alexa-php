@@ -8,6 +8,7 @@ class AudioPlayer
     private $typePrefix = 'AudioPlayer.';
     private $action = 'PLAY';
     private $text = '';
+    private $playBehavior = "ENQUEUE";
 
     public function __construct()
     {
@@ -29,11 +30,16 @@ class AudioPlayer
         return $this->audioItem;
     }
 
+    public function setPlayBehavior($behavior)
+    {
+        $this->playBehavior = $behavior;
+    }
+
     public function render()
     {
         return [
             'type' => $this->getType(),
-            'playBehavior' => 'ENQUEUE',
+            'playBehavior' => $this->playBehavior,
             'audioItem' => $this->audioItem->render(),
         ];
     }

@@ -2,80 +2,101 @@
 
 namespace Alexa\Response;
 
+use Alexa\Response\Card\LinkAccountCard;
 use Alexa\Response\Card\SimpleCard;
 use Alexa\Response\Card\StandardCard;
-use Alexa\Response\Card\LinkAccountCard;
 
-class Response {
-	public $version = '1.0';
-	public $sessionAttributes = [];
+class Response
+{
+    public $version = '1.0';
+    public $sessionAttributes = [];
 
-	public $outputSpeech = null;
-	public $card = null;
-	public $reprompt = null;
-	public $shouldEndSession = false;
+    public $outputSpeech = null;
+    public $card = null;
+    public $reprompt = null;
+    public $shouldEndSession = false;
+    public $directives = null;
 
-	public function __construct() {
-		$this->outputSpeech = new OutputSpeech;
-	}
+    public function __construct()
+    {
+        $this->outputSpeech = new OutputSpeech;
+        $this->directives = new Directives;
+    }
 
-	public function respond($text) {
-		$this->outputSpeech = new OutputSpeech;
-		$this->outputSpeech->text = $text;
+    public function respond($text)
+    {
+        $this->outputSpeech = new OutputSpeech;
+        $this->outputSpeech->text = $text;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function reprompt($text) {
-		$this->reprompt = new Reprompt;
-		$this->reprompt->outputSpeech->text = $text;
+    public function reprompt($text)
+    {
+        $this->reprompt = new Reprompt;
+        $this->reprompt->outputSpeech->text = $text;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function withCard($title, $content = '') {
-		$this->card = new SimpleCard;
-		$this->card->title = $title;
-		$this->card->content = $content;
-		
-		return $this;
-	}
+    public function withCard($title, $content = '')
+    {
+        $this->card = new SimpleCard;
+        $this->card->title = $title;
+        $this->card->content = $content;
+
+        return $this;
+    }
 
     /**
      * @see https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/providing-home-cards-for-the-amazon-alexa-app#creating-a-home-card-to-display-text-and-an-image
      */
-	public function withImageCard($title, $text = '', $smallImageUrl, $largeImageUrl) {
-	    $this->card = new StandardCard();
-	    $this->card->setTitle($title);
-	    $this->card->setText($text);
-	    $this->card->setSmallImageUrl($smallImageUrl);
-	    $this->card->setLargeImageUrl($largeImageUrl);
+    public function withImageCard($title, $text = '', $smallImageUrl, $largeImageUrl)
+    {
+        $this->card = new StandardCard();
+        $this->card->setTitle($title);
+        $this->card->setText($text);
+        $this->card->setSmallImageUrl($smallImageUrl);
+        $this->card->setLargeImageUrl($largeImageUrl);
 
-	    return $this;
+        return $this;
     }
 
-    public function withLinkAccountCard() {
-	    $this->card = new LinkAccountCard();
+    public function withLinkAccountCard()
+    {
+        $this->card = new LinkAccountCard();
 
-	    return $this;
+        return $this;
     }
 
-	public function endSession($shouldEndSession = true) {
-		$this->shouldEndSession = $shouldEndSession;
+    public function endSession($shouldEndSession = true)
+    {
+        $this->shouldEndSession = $shouldEndSession;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function render() {
-		return [
-			'version' => $this->version,
-			'sessionAttributes' => $this->sessionAttributes,
-			'response' => [
-				'outputSpeech' => $this->outputSpeech ? $this->outputSpeech->render() : null,
-				'card' => $this->card ? $this->card->render() : null,
-				'reprompt' => $this->reprompt ? $this->reprompt->render() : null,
-				'shouldEndSession' => $this->shouldEndSession ? true : false
-			]
-		];
-	}
+    public function withAudioPlayer()
+    {
+        $this->audioPlayer = new AudioPlayer();
+
+        $this->directives->add($this->audioPlayer);
+
+        return $this->audioPlayer;
+    }
+
+    public function render()
+    {
+        return [
+            'version' => $this->version,
+            'sessionAttributes' => $this->sessionAttributes,
+            'response' => [
+                'outputSpeech' => $this->outputSpeech ? $this->outputSpeech->render() : null,
+                'card' => $this->card ? $this->card->render() : null,
+                'reprompt' => $this->reprompt ? $this->reprompt->render() : null,
+                'shouldEndSession' => $this->shouldEndSession ? true : false,
+                'directives' => $this->directives ? $this->directives->render() : null,
+            ],
+        ];
+    }
 }

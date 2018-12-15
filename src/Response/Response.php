@@ -19,7 +19,6 @@ class Response
 
     public function __construct()
     {
-        $this->outputSpeech = new OutputSpeech;
         $this->directives = new Directives;
     }
 

@@ -6,7 +6,7 @@ use Alexa\Response\Media\AudioItem;
 class AudioPlayer
 {
     private $typePrefix = 'AudioPlayer.';
-    private $action = 'PLAY';
+    private $action = 'Play';
     private $text = '';
     private $playBehavior = "ENQUEUE";
 
